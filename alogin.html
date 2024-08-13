@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <script src="./js/animation.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- <meta http-equiv="refresh" content="4; url=$(link-redirect)"> -->
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="expires" content="-1">
+  <title>Marvan SuperMercado</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--===============================================================================================-->
+  <link rel="icon" type="image/png" href="images/icons/favicon.ico" />
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
+  <!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="css/util.css">
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+
+</head>
+
+<body>
+  <div class="limiter">
+    <div class="container-login100">
+      <div class="wrap-login100">
+        <div class="logo">
+          <img src="./images/logo.svg">
+          <div style="text-align:center">Aqui sempre é mais barato!</div>
+          </span>
+          <div id="conainer" style="text-align:center">
+            <dir id="load">
+              <dotlottie-player src="./animation/load.json" background="transparent" speed="2" style="width: 100%"
+                direction="1" mode="normal" loop autoplay></dotlottie-player>
+              <p class="login100-form-title">Carregando...</p>
+            </dir>
+
+          </div>
+          <div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js'
+    import { getFirestore, collection, addDoc, setDoc, doc, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js'
+    const firebaseConfig = {
+      apiKey: "",
+      authDomain: "",
+      projectId: "",
+      storageBucket: "",
+      messagingSenderId: "",
+      appId: "",
+      measurementId: ""
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const cel = params.get('cel');
+    const nome = params.get('nome');
+    var celGet = '';
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const dbRef = collection(db, "clientes");
+    let dataAtual = new Date();
+    const data = {
+      nome: nome,
+      cel: cel,
+      dateCreation: dataAtual
+    }
+
+    function loadpg() {
+      document.getElementById('load').remove();
+      document.getElementById("conainer").innerHTML = `<dotlottie-player  src="./animation/ok.lottie" background="transparent" speed="1" style="width: 100%" direction="1" mode="normal" loop autoplay></dotlottie-player> <p class="login100-form-title">Wi-Fi liberado, ${nome}.</p>
+      <div style="text-align:center">Obrigado pela preferência!</div>
+      
+      `;
+    }
+
+    if (cel.length != '') {
+
+      const q = await query(dbRef, where("cel", "==", `${cel}`));
+      const querySnapshot = await getDocs(q);
+
+      querySnapshot.forEach((doc) => {
+        celGet = doc.data().cel;
+      });
+      
+      if (celGet == cel) {
+        loadpg();
+      } else {
+
+        try {
+          const newDocRef = await addDoc(dbRef, data);
+          loadpg();
+        } catch (error) {
+          loadpg();
+        }
+      };
+
+    } else {
+      window.location.href = "http://www.marvan.com.br";
+    }
+
+
+  </script>
+
+</body>
+
+</html>
